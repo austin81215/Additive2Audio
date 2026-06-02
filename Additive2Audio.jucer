@@ -4,6 +4,14 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="CyEC4C" name="Additive2Audio">
     <GROUP id="{6E71472A-AC85-7BB3-33B2-DCFFB526542F}" name="Source">
+      <FILE id="uUzqwY" name="SineWaveSound.h" compile="0" resource="0" file="Source/SineWaveSound.h"/>
+      <FILE id="TDx1sz" name="SineWaveVoice.cpp" compile="1" resource="0"
+            file="Source/SineWaveVoice.cpp"/>
+      <FILE id="zsghLy" name="SineWaveVoice.h" compile="0" resource="0" file="Source/SineWaveVoice.h"/>
+      <FILE id="AnDxg7" name="SynthAudioSource.cpp" compile="1" resource="0"
+            file="Source/SynthAudioSource.cpp"/>
+      <FILE id="QJWtp4" name="SynthAudioSource.h" compile="0" resource="0"
+            file="Source/SynthAudioSource.h"/>
       <FILE id="Nl2rhL" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="lKzAWU" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="h3jQi4" name="MainComponent.cpp" compile="1" resource="0"
