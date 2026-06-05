@@ -17,6 +17,11 @@ void SynthAudioSource::setUsingSineWaveSound()
 void SynthAudioSource::prepareToPlay(int samplesPerBlockExpected, double sampleRate) 
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
+
+    for(auto i = 0; i < synth.getNumVoices(); ++i)
+        if(auto* voice = dynamic_cast<SineWaveVoice*>(synth.getVoice(i)))
+            voice->prepare(sampleRate, samplesPerBlockExpected, 1);
+
     midiCollector.reset(sampleRate);
 }
 
