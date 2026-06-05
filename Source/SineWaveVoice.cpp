@@ -6,6 +6,8 @@ SineWaveVoice::SineWaveVoice()
     osc.initialise([](float x){
             return std::sin(x);
             });
+
+    env.setParameters(juce::ADSR::Parameters(0.1, 0.1, 0.5, 0.5));
 }
 
 bool SineWaveVoice::canPlaySound (juce::SynthesiserSound* sound) 
@@ -17,6 +19,7 @@ void SineWaveVoice::startNote (int midiNoteNumber, float velocity,
         juce::SynthesiserSound*, int /*currentPitchWheelPosition*/) 
 {
     osc.setFrequency(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber));
+    env.noteOn();
 }
 
 void SineWaveVoice::stopNote (float /*velocity*/, bool allowTailOff) 
@@ -31,6 +34,8 @@ void SineWaveVoice::stopNote (float /*velocity*/, bool allowTailOff)
         clearCurrentNote();
         angleDelta = 0.0;
     }
+
+    env.noteOff();
 }
 
 void SineWaveVoice::pitchWheelMoved (int) {}
@@ -40,7 +45,7 @@ void SineWaveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
 {
     while (--numSamples >= 0) 
     {
-        auto currentSample = osc.processSample(0.0f) * 0.1;
+        auto currentSample = osc.processSample(0.0f) * 0.1 * env.getNextSample();
         for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
             outputBuffer.addSample (i, startSample, currentSample);
         ++startSample;
@@ -54,4 +59,6 @@ void SineWaveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = channels;
     osc.prepare(spec);
+    
+    env.setSampleRate(sampleRate);
 }
