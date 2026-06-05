@@ -6,8 +6,8 @@ SineWaveVoice::SineWaveVoice()
     osc.initialise([](float x){
             return std::sin(x);
             });
-    env.setParameters(juce::ADSR::Parameters(0.1, 0.1, 0.5, 0.5));
-    gain.setGainLinear(0.1);
+    env.setParameters(juce::ADSR::Parameters(A, D, S, R));
+    gain.setGainLinear(volume);
 }
 
 bool SineWaveVoice::canPlaySound (juce::SynthesiserSound* sound) 
@@ -24,17 +24,6 @@ void SineWaveVoice::startNote (int midiNoteNumber, float velocity,
 
 void SineWaveVoice::stopNote (float /*velocity*/, bool allowTailOff) 
 {
-    if (allowTailOff)
-    {
-        if (tailOff == 0.0)
-            tailOff = 1.0;
-    }
-    else
-    {
-        clearCurrentNote();
-        angleDelta = 0.0;
-    }
-
     env.noteOff();
 }
 
