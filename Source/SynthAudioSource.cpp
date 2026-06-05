@@ -1,11 +1,11 @@
 #include "SynthAudioSource.h"
 #include "SineWaveSound.h"
-#include "SineWaveVoice.h"
+#include "AdditiveVoice.h"
 
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState): keyboardState(keyState)
 {
     for(auto i = 0; i < 4; ++i)
-        synth.addVoice(new SineWaveVoice());
+        synth.addVoice(new AdditiveVoice());
     synth.addSound(new SineWaveSound());
 }
 
@@ -19,7 +19,7 @@ void SynthAudioSource::prepareToPlay(int samplesPerBlockExpected, double sampleR
     synth.setCurrentPlaybackSampleRate(sampleRate);
 
     for(auto i = 0; i < synth.getNumVoices(); ++i)
-        if(auto* voice = dynamic_cast<SineWaveVoice*>(synth.getVoice(i)))
+        if(auto* voice = dynamic_cast<AdditiveVoice*>(synth.getVoice(i)))
             voice->prepare(sampleRate, samplesPerBlockExpected, 1);
 
     midiCollector.reset(sampleRate);
