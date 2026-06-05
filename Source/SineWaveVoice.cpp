@@ -6,8 +6,8 @@ SineWaveVoice::SineWaveVoice()
     osc.initialise([](float x){
             return std::sin(x);
             });
-
     env.setParameters(juce::ADSR::Parameters(0.1, 0.1, 0.5, 0.5));
+    gain.setGainLinear(0.1);
 }
 
 bool SineWaveVoice::canPlaySound (juce::SynthesiserSound* sound) 
@@ -45,7 +45,7 @@ void SineWaveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
 {
     while (--numSamples >= 0) 
     {
-        auto currentSample = osc.processSample(0.0f) * 0.1 * env.getNextSample();
+        auto currentSample = gain.processSample(osc.processSample(0.0f) * env.getNextSample());
         for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
             outputBuffer.addSample (i, startSample, currentSample);
         ++startSample;
@@ -58,7 +58,9 @@ void SineWaveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = channels;
+    
     osc.prepare(spec);
+    gain.prepare(spec);
     
     env.setSampleRate(sampleRate);
 }
