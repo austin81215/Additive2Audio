@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 #include "SynthAudioSource.h"
 
-#define numSliders 4
+#define numSliders 8
 
 //==============================================================================
 /*

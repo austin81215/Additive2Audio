@@ -2,7 +2,7 @@
 #include <JuceHeader.h>
 
 // macro rn since used in a template
-#define numHarmonics 4
+#define numHarmonics 8
 
 struct AdditiveVoice: public juce::SynthesiserVoice
 {
