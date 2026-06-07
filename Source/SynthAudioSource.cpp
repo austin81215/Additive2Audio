@@ -31,6 +31,7 @@ void SynthAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& buf
 {
     bufferToFill.clearActiveBufferRegion();
     juce::MidiBuffer incomingMidi;
+    midiCollector.removeNextBlockOfMessages(incomingMidi, bufferToFill.numSamples);
     keyboardState.processNextMidiBuffer(incomingMidi, bufferToFill.startSample, bufferToFill.numSamples, true); 
     synth.renderNextBlock (*bufferToFill.buffer, incomingMidi, bufferToFill.startSample, bufferToFill.numSamples); 
 }
