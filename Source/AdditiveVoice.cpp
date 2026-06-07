@@ -20,7 +20,7 @@ void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
 {
     auto hz = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
     for(auto i = 0; i < oscs.size(); i++)
-        oscs[i].setFrequency(hz * (i + 1));
+        oscs[i].setFrequency(hz * (i + 1), true);
 
     env.noteOn();
 }
