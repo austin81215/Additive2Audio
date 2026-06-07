@@ -29,6 +29,7 @@ MainComponent::MainComponent():
         addAndMakeVisible(*slider);
         slider->setRange(0., 5);
         slider->setNumDecimalPlacesToDisplay(2);
+        slider->setSkewFactorFromMidPoint(1);
         slider->addListener(this);
     }
 
