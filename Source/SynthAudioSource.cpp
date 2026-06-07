@@ -39,3 +39,10 @@ juce::MidiMessageCollector* SynthAudioSource::getMidiCollector()
 {
     return &midiCollector;
 }
+
+void SynthAudioSource::setHarmonicLevel(int index, float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        // AdditiveVoice is the only voice we use so we can static cast
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level);
+}

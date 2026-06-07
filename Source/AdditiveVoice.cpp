@@ -62,3 +62,10 @@ void AdditiveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
     
     env.setSampleRate(sampleRate);
 }
+
+void AdditiveVoice::setHarmonicLevel(int index, float level)
+{
+    if(level < 0 || level > 1)
+        throw std::range_error("harmonic level must be between 0 and 1 inclusive");
+    coeffs[index] = level;
+}

@@ -8,8 +8,16 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    setSize (600, 160);
+    setSize (600, 160 + 30 * numSliders);
     startTimer (400);
+
+    for(auto& slider: harmonicSliders)
+    {
+        addAndMakeVisible(slider);
+        slider.setRange(0., 1.);
+        slider.setNumDecimalPlacesToDisplay(2);
+        slider.addListener(this);
+    }
 
     addAndMakeVisible (midiInputListLabel);
     midiInputListLabel.setText ("MIDI Input:", juce::dontSendNotification);
@@ -91,8 +99,10 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    midiInputList.setBounds (200, 10, getWidth() - 210, 20);
-    keyboardComponent.setBounds (10, 40, getWidth() - 20, getHeight() - 50);
+    midiInputList.setBounds (10, 10, getWidth() - 20, 20);
+    keyboardComponent.setBounds (10, 40, getWidth() - 20, 100);
+    for(auto i = 0; i < numSliders; i++)
+        harmonicSliders[i].setBounds(10, i * 30 + 150, getWidth() - 20, 20);
 }
 
 void MainComponent::timerCallback() 
@@ -112,4 +122,11 @@ void MainComponent::setMidiInput(int index)
     deviceManager.addMidiInputDeviceCallback (newInput.identifier, synthAudioSource.getMidiCollector()); 
     midiInputList.setSelectedId (index + 1, juce::dontSendNotification);
     lastInputIndex = index;
+}
+
+void MainComponent::sliderValueChanged(juce::Slider* slider)
+{
+    for(auto i = 0; i < numSliders; i++)
+        if(&(harmonicSliders[i]) == slider)
+            synthAudioSource.setHarmonicLevel(i, slider->getValue());
 }

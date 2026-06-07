@@ -3,12 +3,17 @@
 #include <JuceHeader.h>
 #include "SynthAudioSource.h"
 
+#define numSliders 4
+
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::AudioAppComponent, private juce::Timer
+class MainComponent  : 
+    public juce::AudioAppComponent, 
+    private juce::Timer, 
+    private juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -33,8 +38,10 @@ private:
     juce::ComboBox midiInputList;
     juce::Label midiInputListLabel;
     int lastInputIndex = 0;
+    std::array<juce::Slider, numSliders> harmonicSliders;
 
     void timerCallback() override;
+    void sliderValueChanged(juce::Slider* slider) override;
     void setMidiInput(int index);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
