@@ -29,7 +29,7 @@ struct AdditiveVoice: public juce::SynthesiserVoice
 private:
     std::array<juce::dsp::Oscillator<float>, numHarmonics> oscs;
     // saw wave for now
-    std::array<float, numHarmonics> coeffs = {1, 1/2., 1/3., 1/4.};
+    std::array<float, numHarmonics> coeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8};
     juce::ADSR env;
     juce::dsp::Gain<float> gain;
 
@@ -37,5 +37,5 @@ private:
     const float D = 0.1;
     const float S = 0.5;
     const float R = 0.5;
-    const float volume = 0.2;
+    const float volume = 1. / numHarmonics / 4; // 4 b/c 4 voices
 };
