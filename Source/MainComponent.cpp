@@ -20,6 +20,10 @@ MainComponent::MainComponent():
         slider.addListener(this);
     }
 
+    auto harmonicLevels = synthAudioSource.getHarmonicLevels();
+    for(auto i = 0; i < numSliders; i++)
+        harmonicSliders[i].setValue(harmonicLevels[i], juce::dontSendNotification);
+
     for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
     {
         addAndMakeVisible(*slider);
@@ -32,6 +36,11 @@ MainComponent::MainComponent():
     sustainSlider.setRange(0., 1);
     sustainSlider.setNumDecimalPlacesToDisplay(2);
     sustainSlider.addListener(this);
+
+    attackSlider.setValue(synthAudioSource.getAttack(), juce::dontSendNotification);
+    decaySlider.setValue(synthAudioSource.getDecay(), juce::dontSendNotification);
+    sustainSlider.setValue(synthAudioSource.getSustain(), juce::dontSendNotification);
+    releaseSlider.setValue(synthAudioSource.getRelease(), juce::dontSendNotification);
 
     addAndMakeVisible(attackLabel);
     attackLabel.setText("A", juce::dontSendNotification);

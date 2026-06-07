@@ -21,15 +21,20 @@ struct AdditiveVoice: public juce::SynthesiserVoice
     void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
     void prepare(double sampleRate, int samplesPerBlock, int chanels);
     void setHarmonicLevel(int index, float level);
+    std::array<float, numHarmonics> getHarmonicLevels();
     void setAttack(float level);
     void setDecay(float level);
     void setSustain(float level);
     void setRelease(float level);
+    float getAttack();
+    float getDecay();
+    float getSustain();
+    float getRelease();
 
 private:
     std::array<juce::dsp::Oscillator<float>, numHarmonics> oscs;
     // saw wave for now
-    std::array<float, numHarmonics> coeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8};
+    std::array<float, numHarmonics> coeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
     juce::ADSR env;
     juce::dsp::Gain<float> gain;
 

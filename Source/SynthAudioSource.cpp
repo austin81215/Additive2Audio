@@ -71,3 +71,28 @@ void SynthAudioSource::setRelease(float level)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setRelease(level);
 }
 
+std::array<float, 8> SynthAudioSource::getHarmonicLevels()
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getHarmonicLevels();
+}
+
+float SynthAudioSource::getAttack()
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getAttack();
+}
+
+float SynthAudioSource::getDecay()
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getDecay();
+}
+
+float SynthAudioSource::getSustain()
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getSustain();
+}
+
+float SynthAudioSource::getRelease()
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getRelease();
+}
+

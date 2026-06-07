@@ -94,3 +94,28 @@ void AdditiveVoice::setRelease(float level)
     env.setParameters(juce::ADSR::Parameters(params.attack, params.decay, params.sustain, level));
 }
 
+std::array<float, numHarmonics> AdditiveVoice::getHarmonicLevels()
+{
+    return coeffs;
+}
+
+float AdditiveVoice::getAttack()
+{
+    return env.getParameters().attack;
+}
+
+float AdditiveVoice::getDecay()
+{
+    return env.getParameters().decay;
+}
+
+float AdditiveVoice::getSustain()
+{
+    return env.getParameters().sustain;
+}
+
+float AdditiveVoice::getRelease()
+{
+    return env.getParameters().release;
+}
+
