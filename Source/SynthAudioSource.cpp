@@ -46,3 +46,28 @@ void SynthAudioSource::setHarmonicLevel(int index, float level)
         // AdditiveVoice is the only voice we use so we can static cast
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level);
 }
+
+void SynthAudioSource::setAttack(float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setAttack(level);
+}
+
+void SynthAudioSource::setDecay(float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setDecay(level);
+}
+
+void SynthAudioSource::setSustain(float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setSustain(level);
+}
+
+void SynthAudioSource::setRelease(float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setRelease(level);
+}
+

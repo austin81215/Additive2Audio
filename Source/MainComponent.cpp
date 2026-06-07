@@ -8,7 +8,8 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    setSize (600, 160 + 30 * numSliders);
+    auto height = 160 + 30 * (4 + numSliders);
+    setSize (600, height);
     startTimer (400);
 
     for(auto& slider: harmonicSliders)
@@ -18,6 +19,35 @@ MainComponent::MainComponent():
         slider.setNumDecimalPlacesToDisplay(2);
         slider.addListener(this);
     }
+
+    for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
+    {
+        addAndMakeVisible(*slider);
+        slider->setRange(0., 5);
+        slider->setNumDecimalPlacesToDisplay(2);
+        slider->addListener(this);
+    }
+
+    addAndMakeVisible(sustainSlider);
+    sustainSlider.setRange(0., 1);
+    sustainSlider.setNumDecimalPlacesToDisplay(2);
+    sustainSlider.addListener(this);
+
+    addAndMakeVisible(attackLabel);
+    attackLabel.setText("A", juce::dontSendNotification);
+    attackLabel.attachToComponent(&attackSlider, true);
+    
+    addAndMakeVisible(decayLabel);
+    decayLabel.setText("D", juce::dontSendNotification);
+    decayLabel.attachToComponent(&decaySlider, true);
+
+    addAndMakeVisible(sustainLabel);
+    sustainLabel.setText("S", juce::dontSendNotification);
+    sustainLabel.attachToComponent(&sustainSlider, true);
+
+    addAndMakeVisible(releaseLabel);
+    releaseLabel.setText("R", juce::dontSendNotification);
+    releaseLabel.attachToComponent(&releaseSlider, true);
 
     addAndMakeVisible (midiInputListLabel);
     midiInputListLabel.setText ("MIDI Input:", juce::dontSendNotification);
@@ -103,6 +133,10 @@ void MainComponent::resized()
     keyboardComponent.setBounds (10, 40, getWidth() - 20, 100);
     for(auto i = 0; i < numSliders; i++)
         harmonicSliders[i].setBounds(10, i * 30 + 150, getWidth() - 20, 20);
+    attackSlider.setBounds(20, 400, getWidth() - 30, 20);
+    decaySlider.setBounds(20, 430, getWidth() - 30, 20);
+    sustainSlider.setBounds(20, 460, getWidth() - 30, 20);
+    releaseSlider.setBounds(20, 490, getWidth() - 30, 20);
 }
 
 void MainComponent::timerCallback() 
@@ -126,7 +160,16 @@ void MainComponent::setMidiInput(int index)
 
 void MainComponent::sliderValueChanged(juce::Slider* slider)
 {
-    for(auto i = 0; i < numSliders; i++)
-        if(&(harmonicSliders[i]) == slider)
-            synthAudioSource.setHarmonicLevel(i, slider->getValue());
+    if(slider == &attackSlider)
+        synthAudioSource.setAttack(slider->getValue());
+    else if(slider == &decaySlider)
+        synthAudioSource.setDecay(slider->getValue());
+    else if(slider == &sustainSlider)
+        synthAudioSource.setSustain(slider->getValue());
+    else if(slider == &releaseSlider)
+        synthAudioSource.setRelease(slider->getValue());
+    else
+        for(auto i = 0; i < numSliders; i++)
+            if(&(harmonicSliders[i]) == slider)
+                synthAudioSource.setHarmonicLevel(i, slider->getValue());
 }

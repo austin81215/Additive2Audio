@@ -21,6 +21,10 @@ struct AdditiveVoice: public juce::SynthesiserVoice
     void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
     void prepare(double sampleRate, int samplesPerBlock, int chanels);
     void setHarmonicLevel(int index, float level);
+    void setAttack(float level);
+    void setDecay(float level);
+    void setSustain(float level);
+    void setRelease(float level);
 
 private:
     std::array<juce::dsp::Oscillator<float>, numHarmonics> oscs;

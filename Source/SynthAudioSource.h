@@ -11,6 +11,10 @@ class SynthAudioSource: public juce::AudioSource
         void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
         juce::MidiMessageCollector* getMidiCollector();
         void setHarmonicLevel(int index, float level);
+        void setAttack(float level);
+        void setDecay(float level);
+        void setSustain(float level);
+        void setRelease(float level);
     
     private:
         juce::MidiKeyboardState& keyboardState;

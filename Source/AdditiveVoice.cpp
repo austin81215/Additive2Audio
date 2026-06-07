@@ -69,3 +69,28 @@ void AdditiveVoice::setHarmonicLevel(int index, float level)
         throw std::range_error("harmonic level must be between 0 and 1 inclusive");
     coeffs[index] = level;
 }
+
+void AdditiveVoice::setAttack(float level)
+{
+    auto params = env.getParameters();
+    env.setParameters(juce::ADSR::Parameters(level, params.decay, params.sustain, params.release));
+}
+
+void AdditiveVoice::setDecay(float level)
+{
+    auto params = env.getParameters();
+    env.setParameters(juce::ADSR::Parameters(params.attack, level, params.sustain, params.release));
+}
+
+void AdditiveVoice::setSustain(float level)
+{
+    auto params = env.getParameters();
+    env.setParameters(juce::ADSR::Parameters(params.attack, params.decay, level, params.release));
+}
+
+void AdditiveVoice::setRelease(float level)
+{
+    auto params = env.getParameters();
+    env.setParameters(juce::ADSR::Parameters(params.attack, params.decay, params.sustain, level));
+}
+

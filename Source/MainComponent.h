@@ -39,6 +39,14 @@ private:
     juce::Label midiInputListLabel;
     int lastInputIndex = 0;
     std::array<juce::Slider, numSliders> harmonicSliders;
+    juce::Slider attackSlider;
+    juce::Slider decaySlider;
+    juce::Slider sustainSlider;
+    juce::Slider releaseSlider;
+    juce::Label attackLabel;
+    juce::Label decayLabel;
+    juce::Label sustainLabel;
+    juce::Label releaseLabel;
 
     void timerCallback() override;
     void sliderValueChanged(juce::Slider* slider) override;
