@@ -7,6 +7,10 @@ AdditiveVoice::AdditiveVoice()
         osc.initialise([](float x){
                 return std::sin(x);
                 });
+    for(auto& osc: inharmonicOscs)
+        osc.initialise([](float x){
+                return std::sin(x);
+                });
     env.setParameters(juce::ADSR::Parameters(A, D, S, R));
     gain.setGainLinear(volume);
 }
@@ -21,6 +25,8 @@ void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
     auto hz = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
     for(auto i = 0; i < oscs.size(); i++)
         oscs[i].setFrequency(hz * (i + 1), true);
+    for(auto i = 0; i < inharmonicOscs.size(); i++)
+        inharmonicOscs[i].setFrequency(hz * inharmonicPitches[i], true);
 
     env.noteOn();
 }
@@ -38,8 +44,13 @@ void AdditiveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
     while (--numSamples >= 0) 
     {
         auto currentSample = 0.0;
+
         for(auto i = 0; i < oscs.size(); i++)
             currentSample += oscs[i].processSample(0.0f) * coeffs[i];
+        
+        for(auto i = 0; i < inharmonicOscs.size(); i++)
+            currentSample += inharmonicOscs[i].processSample(0.0f) * inharmonicCoeffs[i];
+
         currentSample = gain.processSample(currentSample * env.getNextSample());
 
         for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
@@ -58,6 +69,9 @@ void AdditiveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
     for(auto& osc: oscs)
         osc.prepare(spec);
 
+    for(auto& osc: inharmonicOscs)
+        osc.prepare(spec);
+
     gain.prepare(spec);
     
     env.setSampleRate(sampleRate);
@@ -67,11 +81,30 @@ void AdditiveVoice::setHarmonicLevel(int index, float level)
 {
     if(level < 0 || level > 1)
         throw std::range_error("harmonic level must be between 0 and 1 inclusive");
+    if(index < 0 || index >= numHarmonics)
+        throw std::range_error("harmonic index out of bounds");
     coeffs[index] = level;
+}
+
+void AdditiveVoice::setInharmonicLevel(int index, float level)
+{
+    if(level < 0 || level > 1)
+        throw std::range_error("harmonic level must be between 0 and 1 inclusive");
+    if(index < 0 || index >= numInharmonics)
+        throw std::range_error("harmonic index out of bounds");
+    inharmonicCoeffs[index] = level;
+}
+
+void AdditiveVoice::setInharmonicPitch(int index, float mult)
+{
+    if(index < 0 || index >= numInharmonics)
+        throw std::range_error("harmonic index out of bounds");
+    inharmonicPitches[index] = mult;
 }
 
 void AdditiveVoice::setPreset(Preset preset)
 {
+    inharmonicCoeffs = {0, 0, 0, 0};
     switch(preset)
     {
         case Preset::Sine:

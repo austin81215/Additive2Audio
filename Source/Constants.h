@@ -1,7 +1,8 @@
 #pragma once
 
-// has to be a macro since used in a template
+// have to be macros since used in templates
 #define numHarmonics 8
+#define numInharmonics 4
 
 const int numVoices = 4;
 

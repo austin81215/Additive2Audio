@@ -103,3 +103,14 @@ float SynthAudioSource::getRelease()
     return static_cast<AdditiveVoice*>(synth.getVoice(0))->getRelease();
 }
 
+void SynthAudioSource::setInharmonicLevel(int index, float level)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicLevel(index, level);
+}
+
+void SynthAudioSource::setInharmonicPitch(int index, float mult)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicPitch(index, mult);
+}

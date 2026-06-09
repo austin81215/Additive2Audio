@@ -38,6 +38,8 @@ private:
     juce::Label midiInputListLabel;
     int lastInputIndex = 0;
     std::array<juce::Slider, numHarmonics> harmonicSliders;
+    std::array<juce::Slider, numInharmonics> inharmonicPitchSliders;
+    std::array<juce::Slider, numInharmonics> inharmonicLevelSliders;
     juce::Slider attackSlider;
     juce::Slider decaySlider;
     juce::Slider sustainSlider;
