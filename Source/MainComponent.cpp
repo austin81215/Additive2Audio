@@ -8,7 +8,7 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    auto height = 160 + 30 * (4 + numSliders);
+    auto height = 160 + 30 * (4 + numHarmonics);
     setSize (600, height);
     startTimer (400);
 
@@ -21,7 +21,7 @@ MainComponent::MainComponent():
     }
 
     auto harmonicLevels = synthAudioSource.getHarmonicLevels();
-    for(auto i = 0; i < numSliders; i++)
+    for(auto i = 0; i < numHarmonics; i++)
         harmonicSliders[i].setValue(harmonicLevels[i], juce::dontSendNotification);
 
     for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
@@ -141,7 +141,7 @@ void MainComponent::resized()
 
     midiInputList.setBounds (10, 10, getWidth() - 20, 20);
     keyboardComponent.setBounds (10, 40, getWidth() - 20, 100);
-    for(auto i = 0; i < numSliders; i++)
+    for(auto i = 0; i < numHarmonics; i++)
         harmonicSliders[i].setBounds(10, i * 30 + 150, getWidth() - 20, 20);
     attackSlider.setBounds(20, 400, getWidth() - 30, 20);
     decaySlider.setBounds(20, 430, getWidth() - 30, 20);
@@ -179,7 +179,7 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
     else if(slider == &releaseSlider)
         synthAudioSource.setRelease(slider->getValue());
     else
-        for(auto i = 0; i < numSliders; i++)
+        for(auto i = 0; i < numHarmonics; i++)
             if(&(harmonicSliders[i]) == slider)
                 synthAudioSource.setHarmonicLevel(i, slider->getValue());
 }

@@ -6,6 +6,7 @@
     <GROUP id="{6E71472A-AC85-7BB3-33B2-DCFFB526542F}" name="Source">
       <FILE id="MlSS1c" name="AdditiveVoice.cpp" compile="1" resource="0"
             file="Source/AdditiveVoice.cpp"/>
+      <FILE id="amgalH" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
       <FILE id="RY0LcQ" name="AdditiveVoice.h" compile="0" resource="0" file="Source/AdditiveVoice.h"/>
       <FILE id="uUzqwY" name="SineWaveSound.h" compile="0" resource="0" file="Source/SineWaveSound.h"/>
       <FILE id="TDx1sz" name="SineWaveVoice.cpp" compile="1" resource="0"

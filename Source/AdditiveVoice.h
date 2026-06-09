@@ -1,8 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-
-// macro rn since used in a template
-#define numHarmonics 8
+#include "Constants.h"
 
 struct AdditiveVoice: public juce::SynthesiserVoice
 {
@@ -42,5 +40,5 @@ private:
     const float D = 0.1;
     const float S = 0.5;
     const float R = 0.5;
-    const float volume = 1. / numHarmonics / 4; // 4 b/c 4 voices
+    const float volume = 1. / numHarmonics / numVoices;
 };

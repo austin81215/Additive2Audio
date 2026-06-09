@@ -2,8 +2,7 @@
 
 #include <JuceHeader.h>
 #include "SynthAudioSource.h"
-
-#define numSliders 8
+#include "Constants.h"
 
 //==============================================================================
 /*
@@ -38,7 +37,7 @@ private:
     juce::ComboBox midiInputList;
     juce::Label midiInputListLabel;
     int lastInputIndex = 0;
-    std::array<juce::Slider, numSliders> harmonicSliders;
+    std::array<juce::Slider, numHarmonics> harmonicSliders;
     juce::Slider attackSlider;
     juce::Slider decaySlider;
     juce::Slider sustainSlider;

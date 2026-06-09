@@ -1,7 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-
-#define numHarmonics 8
+#include "Constants.h"
 
 class SynthAudioSource: public juce::AudioSource
 {
@@ -13,7 +12,7 @@ class SynthAudioSource: public juce::AudioSource
         void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
         juce::MidiMessageCollector* getMidiCollector();
         void setHarmonicLevel(int index, float level);
-        std::array<float, 8> getHarmonicLevels();
+        std::array<float, numHarmonics> getHarmonicLevels();
         void setAttack(float level);
         void setDecay(float level);
         void setSustain(float level);
