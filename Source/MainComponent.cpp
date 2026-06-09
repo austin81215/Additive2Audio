@@ -64,7 +64,7 @@ MainComponent::MainComponent():
     presetBox.addItem("Square", static_cast<int>(Preset::Square));
     presetBox.addItem("Classic Organ", static_cast<int>(Preset::Organ));
     presetBox.addItem("Pull Out All Stops", static_cast<int>(Preset::AllStops));
-    presetBox.setSelectedId(0);
+    presetBox.setSelectedId(2);
     presetBox.onChange = [this]{presetHandler();};
 
     addAndMakeVisible (midiInputListLabel);
