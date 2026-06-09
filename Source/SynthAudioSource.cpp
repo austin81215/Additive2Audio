@@ -48,6 +48,12 @@ void SynthAudioSource::setHarmonicLevel(int index, float level)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level);
 }
 
+void SynthAudioSource::setPreset(Preset preset)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setPreset(preset);
+}
+
 void SynthAudioSource::setAttack(float level)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)

@@ -12,6 +12,7 @@ class SynthAudioSource: public juce::AudioSource
         void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
         juce::MidiMessageCollector* getMidiCollector();
         void setHarmonicLevel(int index, float level);
+        void setPreset(Preset preset);
         std::array<float, numHarmonics> getHarmonicLevels();
         void setAttack(float level);
         void setDecay(float level);

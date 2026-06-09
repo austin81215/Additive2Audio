@@ -8,7 +8,7 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    auto height = 160 + 30 * (4 + numHarmonics);
+    auto height = 190 + 30 * (4 + numHarmonics);
     setSize (600, height);
     startTimer (400);
 
@@ -20,9 +20,7 @@ MainComponent::MainComponent():
         slider.addListener(this);
     }
 
-    auto harmonicLevels = synthAudioSource.getHarmonicLevels();
-    for(auto i = 0; i < numHarmonics; i++)
-        harmonicSliders[i].setValue(harmonicLevels[i], juce::dontSendNotification);
+    updateHarmonicSliders();
 
     for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
     {
@@ -58,6 +56,16 @@ MainComponent::MainComponent():
     addAndMakeVisible(releaseLabel);
     releaseLabel.setText("R", juce::dontSendNotification);
     releaseLabel.attachToComponent(&releaseSlider, true);
+
+    addAndMakeVisible(presetBox);
+    presetBox.addItem("Sine", static_cast<int>(Preset::Sine));
+    presetBox.addItem("Saw", static_cast<int>(Preset::Saw));
+    presetBox.addItem("Filtered Saw", static_cast<int>(Preset::FilteredSaw));
+    presetBox.addItem("Square", static_cast<int>(Preset::Square));
+    presetBox.addItem("Classic Organ", static_cast<int>(Preset::Organ));
+    presetBox.addItem("Pull Out All Stops", static_cast<int>(Preset::AllStops));
+    presetBox.setSelectedId(0);
+    presetBox.onChange = [this]{presetHandler();};
 
     addAndMakeVisible (midiInputListLabel);
     midiInputListLabel.setText ("MIDI Input:", juce::dontSendNotification);
@@ -147,6 +155,7 @@ void MainComponent::resized()
     decaySlider.setBounds(20, 430, getWidth() - 30, 20);
     sustainSlider.setBounds(20, 460, getWidth() - 30, 20);
     releaseSlider.setBounds(20, 490, getWidth() - 30, 20);
+    presetBox.setBounds (10, 520, getWidth() - 20, 20);
 }
 
 void MainComponent::timerCallback() 
@@ -182,4 +191,20 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
         for(auto i = 0; i < numHarmonics; i++)
             if(&(harmonicSliders[i]) == slider)
                 synthAudioSource.setHarmonicLevel(i, slider->getValue());
+}
+
+void MainComponent::presetHandler()
+{
+    auto selected = presetBox.getSelectedId();
+    if(selected == 0)
+        return;
+    synthAudioSource.setPreset(static_cast<Preset>(selected));
+    updateHarmonicSliders();
+}
+
+void MainComponent::updateHarmonicSliders()
+{
+    auto harmonicLevels = synthAudioSource.getHarmonicLevels();
+    for(auto i = 0; i < numHarmonics; i++)
+        harmonicSliders[i].setValue(harmonicLevels[i], juce::dontSendNotification);
 }

@@ -70,6 +70,31 @@ void AdditiveVoice::setHarmonicLevel(int index, float level)
     coeffs[index] = level;
 }
 
+void AdditiveVoice::setPreset(Preset preset)
+{
+    switch(preset)
+    {
+        case Preset::Sine:
+            coeffs = {1, 0, 0, 0, 0, 0, 0, 0};
+            break;
+        case Preset::Saw:
+            coeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
+            break;
+        case Preset::FilteredSaw:
+            coeffs = {1, 1/2., 1/3., 1/4., 0, 0, 0, 0};
+            break;
+        case Preset::Square:
+            coeffs = {1, 0, 1/3., 0, 1/5., 0, 1/7., 0};
+            break;
+        case Preset::Organ:
+            coeffs = {1, 1, 1, 0, 0, 0, 0, 1};
+            break;
+        case Preset::AllStops:
+            coeffs = {1, 1, 1, 1, 1, 1, 1, 1};
+            break;
+    }
+}
+
 void AdditiveVoice::setAttack(float level)
 {
     auto params = env.getParameters();
@@ -118,4 +143,5 @@ float AdditiveVoice::getRelease()
 {
     return env.getParameters().release;
 }
+
 

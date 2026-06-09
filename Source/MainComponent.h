@@ -46,10 +46,13 @@ private:
     juce::Label decayLabel;
     juce::Label sustainLabel;
     juce::Label releaseLabel;
+    juce::ComboBox presetBox;
 
     void timerCallback() override;
     void sliderValueChanged(juce::Slider* slider) override;
     void setMidiInput(int index);
+    void presetHandler();
+    void updateHarmonicSliders();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

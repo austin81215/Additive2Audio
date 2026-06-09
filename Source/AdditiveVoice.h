@@ -4,6 +4,7 @@
 
 struct AdditiveVoice: public juce::SynthesiserVoice
 {
+
     AdditiveVoice();
 
     bool canPlaySound (juce::SynthesiserSound* sound) override;
@@ -19,6 +20,7 @@ struct AdditiveVoice: public juce::SynthesiserVoice
     void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
     void prepare(double sampleRate, int samplesPerBlock, int chanels);
     void setHarmonicLevel(int index, float level);
+    void setPreset(Preset preset);
     std::array<float, numHarmonics> getHarmonicLevels();
     void setAttack(float level);
     void setDecay(float level);
