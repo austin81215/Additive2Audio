@@ -52,8 +52,14 @@ private:
 
     void timerCallback() override;
     void sliderValueChanged(juce::Slider* slider) override;
+
+    // from tutorial, sets MIDI input to the given index
     void setMidiInput(int index);
+
+    // handler for when a preset is selected
     void presetHandler();
+
+    // updates the GUI harmonic sliders to match the underlying levels in the backend
     void updateHarmonicSliders();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

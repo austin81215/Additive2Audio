@@ -18,19 +18,48 @@ struct AdditiveVoice: public juce::SynthesiserVoice
     void controllerMoved (int, int) override;
 
     void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
+    
+    // sets up the voice with the given parameters, call before using
     void prepare(double sampleRate, int samplesPerBlock, int chanels);
+
+    // sets the given harmonic (where 0 is the fundamental) to the given level (between 0 and 1)
     void setHarmonicLevel(int index, float level);
+
+    // sets the given inharmonic to the given level (between 0 and 1)
     void setInharmonicLevel(int index, float level);
+
+    // sets the given harmonic to the given pitch, as a multiple of the fundamental (eg. 1.5 would be a 5th higher)
     void setInharmonicPitch(int index, float mult);
+
+    // sets the harmonic levels to the given preset
     void setPreset(Preset preset);
+
+    // returns the harmonic levels between 0 and 1
     std::array<float, numHarmonics> getHarmonicLevels();
+
+    // sets the attack time in seconds
     void setAttack(float level);
+
+    // sets the decay time in seconds
     void setDecay(float level);
+
+    // sets the sustain level from 0 to 1
     void setSustain(float level);
+
+    // sets the release time in seconds
     void setRelease(float level);
+
+
+    // gets the attack time in seconds
     float getAttack();
+
+    // gets the decay time in seconds
     float getDecay();
+
+    // gets the sustain level from 0 to 1
     float getSustain();
+
+    // gets the release time in seconds
     float getRelease();
 
 private:
