@@ -43,7 +43,7 @@ MainComponent::MainComponent():
     for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
     {
         addAndMakeVisible(*slider);
-        slider->setRange(0., 5);
+        slider->setRange(0.01, 5);
         slider->setNumDecimalPlacesToDisplay(2);
         slider->setSkewFactorFromMidPoint(1);
         slider->addListener(this);

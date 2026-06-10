@@ -4,7 +4,7 @@
 #define numHarmonics 8
 #define numInharmonics 4
 
-const int numVoices = 4;
+const int numVoices = 8;
 
 enum class Preset 
 {
