@@ -29,6 +29,7 @@ void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
         inharmonicOscs[i].setFrequency(hz * inharmonicPitches[i], true);
 
     env.noteOn();
+    noteSamplesElapsed = 0;
 }
 
 void AdditiveVoice::stopNote (float /*velocity*/, bool allowTailOff) 
@@ -43,19 +44,29 @@ void AdditiveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
 {
     while (--numSamples >= 0) 
     {
+        auto elapsedNoteTime = (float)noteSamplesElapsed / sampleRate;
+        auto noteProgress = std::min(elapsedNoteTime / harmonicChangeTime, 1.f);
+
         auto currentSample = 0.0;
 
         for(auto i = 0; i < oscs.size(); i++)
-            currentSample += oscs[i].processSample(0.0f) * coeffs[i];
+        {
+            auto coeff = noteProgress * endCoeffs[i] + (1 - noteProgress) * startCoeffs[i];
+            currentSample += oscs[i].processSample(0.0f) * coeff;
+        }
         
         for(auto i = 0; i < inharmonicOscs.size(); i++)
-            currentSample += inharmonicOscs[i].processSample(0.0f) * inharmonicCoeffs[i];
+        {
+            auto coeff = noteProgress * inharmonicEndCoeffs[i] + (1 - noteProgress) * inharmonicStartCoeffs[i];
+            currentSample += inharmonicOscs[i].processSample(0.0f) * coeff;
+        }
 
         currentSample = gain.processSample(currentSample * env.getNextSample());
 
         for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
             outputBuffer.addSample (i, startSample, currentSample);
         ++startSample;
+        noteSamplesElapsed++;
     }
 }
 
@@ -75,24 +86,42 @@ void AdditiveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
     gain.prepare(spec);
     
     env.setSampleRate(sampleRate);
+
+    this->sampleRate = sampleRate;
 }
 
-void AdditiveVoice::setHarmonicLevel(int index, float level)
+void AdditiveVoice::setHarmonicLevel(int index, float level, NotePositions pos)
 {
     if(level < 0 || level > 1)
         throw std::range_error("harmonic level must be between 0 and 1 inclusive");
     if(index < 0 || index >= numHarmonics)
         throw std::range_error("harmonic index out of bounds");
-    coeffs[index] = level;
+    switch(pos)
+    {
+        case NotePositions::Start:
+            break;
+            startCoeffs[index] = level;
+        case NotePositions::End:
+            endCoeffs[index] = level;
+            break;
+    }
 }
 
-void AdditiveVoice::setInharmonicLevel(int index, float level)
+void AdditiveVoice::setInharmonicLevel(int index, float level, NotePositions pos)
 {
     if(level < 0 || level > 1)
         throw std::range_error("harmonic level must be between 0 and 1 inclusive");
     if(index < 0 || index >= numInharmonics)
         throw std::range_error("harmonic index out of bounds");
-    inharmonicCoeffs[index] = level;
+    switch(pos)
+    {
+        case NotePositions::Start:
+            break;
+            inharmonicStartCoeffs[index] = level;
+        case NotePositions::End:
+            inharmonicEndCoeffs[index] = level;
+            break;
+    }
 }
 
 void AdditiveVoice::setInharmonicPitch(int index, float mult)
@@ -102,28 +131,41 @@ void AdditiveVoice::setInharmonicPitch(int index, float mult)
     inharmonicPitches[index] = mult;
 }
 
-void AdditiveVoice::setPreset(Preset preset)
+void AdditiveVoice::setPreset(Preset preset, NotePositions pos)
 {
-    inharmonicCoeffs = {0, 0, 0, 0};
+    std::array<float, numHarmonics> newCoeffs;
+
     switch(preset)
     {
         case Preset::Sine:
-            coeffs = {1, 0, 0, 0, 0, 0, 0, 0};
+            newCoeffs = {1, 0, 0, 0, 0, 0, 0, 0};
             break;
         case Preset::Saw:
-            coeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
+            newCoeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
             break;
         case Preset::FilteredSaw:
-            coeffs = {1, 1/2., 1/3., 1/4., 0, 0, 0, 0};
+            newCoeffs = {1, 1/2., 1/3., 1/4., 0, 0, 0, 0};
             break;
         case Preset::Square:
-            coeffs = {1, 0, 1/3., 0, 1/5., 0, 1/7., 0};
+            newCoeffs = {1, 0, 1/3., 0, 1/5., 0, 1/7., 0};
             break;
         case Preset::Organ:
-            coeffs = {1, 1, 1, 0, 0, 0, 0, 1};
+            newCoeffs = {1, 1, 1, 0, 0, 0, 0, 1};
             break;
         case Preset::AllStops:
-            coeffs = {1, 1, 1, 1, 1, 1, 1, 1};
+            newCoeffs = {1, 1, 1, 1, 1, 1, 1, 1};
+            break;
+    }
+
+    switch(pos)
+    {
+        case NotePositions::Start:
+            startCoeffs = newCoeffs;
+            inharmonicStartCoeffs = {0, 0, 0, 0};
+            break;
+        case NotePositions::End:
+            endCoeffs = newCoeffs;
+            inharmonicEndCoeffs = {0, 0, 0, 0};
             break;
     }
 }
@@ -152,9 +194,9 @@ void AdditiveVoice::setRelease(float level)
     env.setParameters(juce::ADSR::Parameters(params.attack, params.decay, params.sustain, level));
 }
 
-std::array<float, numHarmonics> AdditiveVoice::getHarmonicLevels()
+std::array<float, numHarmonics> AdditiveVoice::getHarmonicLevels(NotePositions pos)
 {
-    return coeffs;
+    return pos == NotePositions::Start ? startCoeffs : endCoeffs;
 }
 
 float AdditiveVoice::getAttack()
@@ -177,4 +219,12 @@ float AdditiveVoice::getRelease()
     return env.getParameters().release;
 }
 
+void AdditiveVoice::setHarmonicChangeTime(float seconds)
+{
+    harmonicChangeTime = seconds;
+}
 
+std::array<float, numInharmonics> AdditiveVoice::getInharmonicLevels(NotePositions pos)
+{
+    return pos == NotePositions::Start ? inharmonicStartCoeffs : inharmonicEndCoeffs;
+}

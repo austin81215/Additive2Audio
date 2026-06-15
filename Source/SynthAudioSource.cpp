@@ -41,17 +41,17 @@ juce::MidiMessageCollector* SynthAudioSource::getMidiCollector()
     return &midiCollector;
 }
 
-void SynthAudioSource::setHarmonicLevel(int index, float level)
+void SynthAudioSource::setHarmonicLevel(int index, float level, NotePositions pos)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
         // AdditiveVoice is the only voice we use so we can static cast
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level);
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level, pos);
 }
 
-void SynthAudioSource::setPreset(Preset preset)
+void SynthAudioSource::setPreset(Preset preset, NotePositions pos)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setPreset(preset);
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setPreset(preset, pos);
 }
 
 void SynthAudioSource::setAttack(float level)
@@ -78,9 +78,9 @@ void SynthAudioSource::setRelease(float level)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setRelease(level);
 }
 
-std::array<float, 8> SynthAudioSource::getHarmonicLevels()
+std::array<float, 8> SynthAudioSource::getHarmonicLevels(NotePositions pos)
 {
-    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getHarmonicLevels();
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getHarmonicLevels(pos);
 }
 
 float SynthAudioSource::getAttack()
@@ -103,14 +103,25 @@ float SynthAudioSource::getRelease()
     return static_cast<AdditiveVoice*>(synth.getVoice(0))->getRelease();
 }
 
-void SynthAudioSource::setInharmonicLevel(int index, float level)
+void SynthAudioSource::setInharmonicLevel(int index, float level, NotePositions pos)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicLevel(index, level);
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicLevel(index, level, pos);
 }
 
 void SynthAudioSource::setInharmonicPitch(int index, float mult)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicPitch(index, mult);
+}
+
+void SynthAudioSource::setHarmonicChangeTime(float seconds)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicChangeTime(seconds);
+}
+
+std::array<float, numInharmonics> SynthAudioSource::getInharmonicLevels(NotePositions pos)
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getInharmonicLevels(pos);
 }

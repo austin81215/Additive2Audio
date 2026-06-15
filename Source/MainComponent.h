@@ -49,6 +49,10 @@ private:
     juce::Label sustainLabel;
     juce::Label releaseLabel;
     juce::ComboBox presetBox;
+    juce::ComboBox notePosBox;
+    juce::Slider noteChangeTimeSlider;
+    NotePositions currentPosition = NotePositions::End;
+
 
     void timerCallback() override;
     void sliderValueChanged(juce::Slider* slider) override;
@@ -58,6 +62,9 @@ private:
 
     // handler for when a preset is selected
     void presetHandler();
+
+    // handler for when note position changed
+    void notePosHandler();
 
     // updates the GUI harmonic sliders to match the underlying levels in the backend
     void updateHarmonicSliders();

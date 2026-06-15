@@ -14,3 +14,8 @@ enum class Preset
     AllStops
 };
 
+enum class NotePositions
+{
+    Start = 1,
+    End
+};

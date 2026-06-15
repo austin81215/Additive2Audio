@@ -17,19 +17,22 @@ class SynthAudioSource: public juce::AudioSource
         juce::MidiMessageCollector* getMidiCollector();
 
         // sets the given harmonic (where 0 is the fundamental) to the given level (between 0 and 1)
-        void setHarmonicLevel(int index, float level);
+        void setHarmonicLevel(int index, float level, NotePositions pos);
 
         // sets the given inharmonic to the given level (between 0 and 1)
-        void setInharmonicLevel(int index, float level);
+        void setInharmonicLevel(int index, float level, NotePositions pos);
 
         // sets the given harmonic to the given pitch, as a multiple of the fundamental (eg. 1.5 would be a 5th higher)
         void setInharmonicPitch(int index, float mult);
 
         // sets the harmonic levels to the given preset
-        void setPreset(Preset preset);
+        void setPreset(Preset preset, NotePositions pos);
 
         // returns the harmonic levels between 0 and 1
-        std::array<float, numHarmonics> getHarmonicLevels();
+        std::array<float, numHarmonics> getHarmonicLevels(NotePositions pos);
+        
+        // returns the inharmonic levels between 0 and 1
+        std::array<float, numInharmonics> getInharmonicLevels(NotePositions pos);
 
         // sets the attack time in seconds
         void setAttack(float level);
@@ -55,6 +58,9 @@ class SynthAudioSource: public juce::AudioSource
 
         // gets the release time in seconds
         float getRelease();
+
+        // sets the time that it takes to go from the start sound to the end sound
+        void setHarmonicChangeTime(float seconds);
 
     private:
         juce::MidiKeyboardState& keyboardState;
