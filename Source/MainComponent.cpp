@@ -8,11 +8,27 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    auto height = 250 + 30 * (4 + numHarmonics + numInharmonics);
+    auto height = 250 + 30 * (4 + numHarmonics);
     setSize (600, height);
     startTimer (400);
 
-    for(auto& slider: harmonicSliders)
+    for(auto& slider: harmonicPitchSliders)
+    {
+        addAndMakeVisible(slider);
+        slider.setRange(0., 10.);
+        slider.setNumDecimalPlacesToDisplay(2);
+        slider.addListener(this);
+    }
+
+    for(auto& slider: harmonicStartSliders)
+    {
+        addAndMakeVisible(slider);
+        slider.setRange(0., 1.);
+        slider.setNumDecimalPlacesToDisplay(2);
+        slider.addListener(this);
+    }
+
+    for(auto& slider: harmonicEndSliders)
     {
         addAndMakeVisible(slider);
         slider.setRange(0., 1.);
@@ -21,24 +37,6 @@ MainComponent::MainComponent():
     }
 
     updateHarmonicSliders();
-
-    for(auto& slider: inharmonicPitchSliders)
-    {
-        addAndMakeVisible(slider);
-        slider.setRange(0., 16.);
-        slider.setNumDecimalPlacesToDisplay(2);
-        slider.setSkewFactorFromMidPoint(4.);
-        slider.setTextValueSuffix(" x");
-        slider.addListener(this);
-    }
-
-    for(auto& slider: inharmonicLevelSliders)
-    {
-        addAndMakeVisible(slider);
-        slider.setRange(0., 1.);
-        slider.setNumDecimalPlacesToDisplay(2);
-        slider.addListener(this);
-    }
 
     for(auto* slider: std::array{&attackSlider, &decaySlider, &releaseSlider})
     {
@@ -85,14 +83,8 @@ MainComponent::MainComponent():
     presetBox.setSelectedId(2);
     presetBox.onChange = [this]{presetHandler();};
 
-    addAndMakeVisible(notePosBox);
-    notePosBox.addItem("Edit note start", static_cast<int>(NotePositions::Start));
-    notePosBox.addItem("Edit note end", static_cast<int>(NotePositions::End));
-    notePosBox.setSelectedId(2);
-    notePosBox.onChange = [this]{notePosHandler();};
-
     addAndMakeVisible(noteChangeTimeSlider);
-    noteChangeTimeSlider.setRange(0, 5);
+    noteChangeTimeSlider.setRange(0.01, 5);
     noteChangeTimeSlider.setNumDecimalPlacesToDisplay(2);
     noteChangeTimeSlider.setSkewFactorFromMidPoint(1);
     noteChangeTimeSlider.addListener(this);
@@ -180,18 +172,17 @@ void MainComponent::resized()
     midiInputList.setBounds (10, 10, getWidth() - 20, 20);
     keyboardComponent.setBounds (10, 40, getWidth() - 20, 100);
     for(auto i = 0; i < numHarmonics; i++)
-        harmonicSliders[i].setBounds(10, i * 30 + 150, getWidth() - 20, 20);
+    {
+        auto sliderLength = (getWidth() - 40) / 3;
+        harmonicPitchSliders[i].setBounds(10, i * 30 + 150, sliderLength, 20);
+        harmonicStartSliders[i].setBounds(sliderLength + 20, i * 30 + 150, sliderLength, 20);
+        harmonicEndSliders[i].setBounds(2 * sliderLength + 30, i * 30 + 150, sliderLength, 20);
+    }
     attackSlider.setBounds(20, 400, getWidth() - 30, 20);
     decaySlider.setBounds(20, 430, getWidth() - 30, 20);
     sustainSlider.setBounds(20, 460, getWidth() - 30, 20);
     releaseSlider.setBounds(20, 490, getWidth() - 30, 20);
-    for(auto i = 0; i < numInharmonics; i++)
-    {
-        inharmonicPitchSliders[i].setBounds(10, 520 + 30 * i, (getWidth() - 30) / 2, 20);
-        inharmonicLevelSliders[i].setBounds((getWidth() - 30) / 2 + 20, 520 + 30 * i, (getWidth() - 30) / 2, 20);
-    }
     presetBox.setBounds (10, 640, getWidth() - 20, 20);
-    notePosBox.setBounds (10, 670, getWidth() - 20, 20);
     noteChangeTimeSlider.setBounds (10, 700, getWidth() - 20, 20);
 }
 
@@ -228,16 +219,24 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
         synthAudioSource.setHarmonicChangeTime(slider->getValue());
 
     for(auto i = 0; i < numHarmonics; i++)
-        if(&(harmonicSliders[i]) == slider)
-            synthAudioSource.setHarmonicLevel(i, slider->getValue(), currentPosition);
-
-    for(auto i = 0; i < numInharmonics; i++)
     {
-        if(&(inharmonicPitchSliders[i]) == slider)
-            synthAudioSource.setInharmonicPitch(i, slider->getValue());
-        else if(&(inharmonicLevelSliders[i]) == slider)
-            synthAudioSource.setInharmonicLevel(i, slider->getValue(), currentPosition);
+        if(&harmonicPitchSliders[i] == slider)
+        {
+            synthAudioSource.setHarmonicPitch(i, slider->getValue());
+            return;
+        }
+        else if(&harmonicStartSliders[i] == slider)
+        {
+            synthAudioSource.setHarmonicStartLevel(i, slider->getValue());
+            return;
+        }
+        else if(&harmonicEndSliders[i] == slider)
+        {
+            synthAudioSource.setHarmonicEndLevel(i, slider->getValue());
+            return;
+        }
     }
+
 }
 
 void MainComponent::presetHandler()
@@ -245,25 +244,16 @@ void MainComponent::presetHandler()
     auto selected = presetBox.getSelectedId();
     if(selected == 0)
         return;
-    synthAudioSource.setPreset(static_cast<Preset>(selected), currentPosition);
+    synthAudioSource.setPreset(static_cast<Preset>(selected));
     updateHarmonicSliders();
 }
 
 void MainComponent::updateHarmonicSliders()
 {
-    auto harmonicLevels = synthAudioSource.getHarmonicLevels(currentPosition);
-    auto inharmonicLevels = synthAudioSource.getInharmonicLevels(currentPosition);
     for(auto i = 0; i < numHarmonics; i++)
-        harmonicSliders[i].setValue(harmonicLevels[i], juce::dontSendNotification);
-    for(auto i = 0; i < numInharmonics; i++)
-        inharmonicLevelSliders[i].setValue(inharmonicLevels[i], juce::dontSendNotification);
-}
-
-void MainComponent::notePosHandler()
-{
-    auto selected = notePosBox.getSelectedId();
-    if(selected == 0)
-        return;
-    currentPosition = static_cast<NotePositions>(selected);
-    updateHarmonicSliders();
+    {
+        harmonicPitchSliders[i].setValue(synthAudioSource.getHarmonicPitch(i), juce::dontSendNotification);
+        harmonicStartSliders[i].setValue(synthAudioSource.getHarmonicStartLevel(i), juce::dontSendNotification);
+        harmonicEndSliders[i].setValue(synthAudioSource.getHarmonicEndLevel(i), juce::dontSendNotification);
+    }
 }

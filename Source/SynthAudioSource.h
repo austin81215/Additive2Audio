@@ -16,23 +16,26 @@ class SynthAudioSource: public juce::AudioSource
         // gets the underlying MidiCollector
         juce::MidiMessageCollector* getMidiCollector();
 
-        // sets the given harmonic (where 0 is the fundamental) to the given level (between 0 and 1)
-        void setHarmonicLevel(int index, float level, NotePositions pos);
+        // sets the given harmonic (where 0 is the fundamental) to the given start level (between 0 and 1)
+        void setHarmonicStartLevel(int index, float level);
 
-        // sets the given inharmonic to the given level (between 0 and 1)
-        void setInharmonicLevel(int index, float level, NotePositions pos);
+        // sets the given harmonic (where 0 is the fundamental) to the given end level (between 0 and 1)
+        void setHarmonicEndLevel(int index, float level);
 
-        // sets the given harmonic to the given pitch, as a multiple of the fundamental (eg. 1.5 would be a 5th higher)
-        void setInharmonicPitch(int index, float mult);
+        // sets the given harmonic to the given pitch, as a multiple of the fundamental 
+        void setHarmonicPitch(int index, float mult);
+        
+        // gets the start level (0 to 1) of the given harmonic
+        float getHarmonicStartLevel(int index);
+
+        // gets the end level (0 to 1) of the given harmonic
+        float getHarmonicEndLevel(int index);
+
+        // getst the pitch of the given harmonic, as a multiple of the fundamental 
+        float getHarmonicPitch(int index);
 
         // sets the harmonic levels to the given preset
-        void setPreset(Preset preset, NotePositions pos);
-
-        // returns the harmonic levels between 0 and 1
-        std::array<float, numHarmonics> getHarmonicLevels(NotePositions pos);
-        
-        // returns the inharmonic levels between 0 and 1
-        std::array<float, numInharmonics> getInharmonicLevels(NotePositions pos);
+        void setPreset(Preset preset);
 
         // sets the attack time in seconds
         void setAttack(float level);

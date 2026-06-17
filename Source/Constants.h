@@ -1,7 +1,6 @@
 #pragma once
 
 constexpr int numHarmonics = 8;
-constexpr int numInharmonics = 4;
 constexpr int numVoices = 8;
 
 enum class Preset 
@@ -12,10 +11,4 @@ enum class Preset
     Square,
     Organ,
     AllStops
-};
-
-enum class NotePositions
-{
-    Start = 1,
-    End
 };

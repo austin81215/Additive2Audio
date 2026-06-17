@@ -2,11 +2,12 @@
 #include "SineWaveSound.h"
 #include "AdditiveVoice.h"
 
+
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState): keyboardState(keyState)
 {
     for(auto i = 0; i < numVoices; ++i)
         synth.addVoice(new AdditiveVoice());
-    synth.addSound(new SineWaveSound());
+    synth.addSound(new SineWaveSound()); // doesn't do much, probably fine to stay as sine
 }
 
 void SynthAudioSource::setUsingSineWaveSound()
@@ -41,17 +42,31 @@ juce::MidiMessageCollector* SynthAudioSource::getMidiCollector()
     return &midiCollector;
 }
 
-void SynthAudioSource::setHarmonicLevel(int index, float level, NotePositions pos)
+void SynthAudioSource::setHarmonicStartLevel(int index, float level)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
         // AdditiveVoice is the only voice we use so we can static cast
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicLevel(index, level, pos);
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->harmonics[index].startLevel = level;
 }
 
-void SynthAudioSource::setPreset(Preset preset, NotePositions pos)
+void SynthAudioSource::setHarmonicEndLevel(int index, float level)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setPreset(preset, pos);
+        // AdditiveVoice is the only voice we use so we can static cast
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->harmonics[index].endLevel = level;
+}
+
+void SynthAudioSource::setHarmonicPitch(int index, float pitch)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        // AdditiveVoice is the only voice we use so we can static cast
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->harmonics[index].pitch = pitch;
+}
+
+void SynthAudioSource::setPreset(Preset preset)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->setPreset(preset);
 }
 
 void SynthAudioSource::setAttack(float level)
@@ -78,9 +93,19 @@ void SynthAudioSource::setRelease(float level)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->setRelease(level);
 }
 
-std::array<float, 8> SynthAudioSource::getHarmonicLevels(NotePositions pos)
+float SynthAudioSource::getHarmonicStartLevel(int index)
 {
-    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getHarmonicLevels(pos);
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->harmonics[index].startLevel;
+}
+
+float SynthAudioSource::getHarmonicEndLevel(int index)
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->harmonics[index].endLevel;
+}
+
+float SynthAudioSource::getHarmonicPitch(int index)
+{
+    return static_cast<AdditiveVoice*>(synth.getVoice(0))->harmonics[index].pitch;
 }
 
 float SynthAudioSource::getAttack()
@@ -103,25 +128,8 @@ float SynthAudioSource::getRelease()
     return static_cast<AdditiveVoice*>(synth.getVoice(0))->getRelease();
 }
 
-void SynthAudioSource::setInharmonicLevel(int index, float level, NotePositions pos)
-{
-    for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicLevel(index, level, pos);
-}
-
-void SynthAudioSource::setInharmonicPitch(int index, float mult)
-{
-    for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setInharmonicPitch(index, mult);
-}
-
 void SynthAudioSource::setHarmonicChangeTime(float seconds)
 {
     for(auto i = 0; i < synth.getNumVoices(); i++)
-        static_cast<AdditiveVoice*>(synth.getVoice(i))->setHarmonicChangeTime(seconds);
-}
-
-std::array<float, numInharmonics> SynthAudioSource::getInharmonicLevels(NotePositions pos)
-{
-    return static_cast<AdditiveVoice*>(synth.getVoice(0))->getInharmonicLevels(pos);
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->harmonicChangeTime = seconds;
 }
