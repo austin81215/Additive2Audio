@@ -38,6 +38,7 @@ void AdditiveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
     {
         auto elapsedNoteTime = (float)noteSamplesElapsed / sampleRate;
         auto noteProgress = std::min(elapsedNoteTime / harmonicChangeTime, 1.f);
+        noteProgress *= noteProgress;
 
         auto currentSample = 0.0;
 
