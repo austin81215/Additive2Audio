@@ -31,6 +31,9 @@ public:
 private:
     //==============================================================================
     // Your private member variables go here...
+    const int defaultThinHeight = 50;
+    const int defaultThickHeight = 100;
+
     juce::MidiKeyboardState keyboardState;
     SynthAudioSource synthAudioSource;
     juce::MidiKeyboardComponent keyboardComponent;
@@ -40,6 +43,9 @@ private:
     std::array<juce::Slider, numHarmonics> harmonicPitchSliders;
     std::array<juce::Slider, numHarmonics> harmonicStartSliders;
     std::array<juce::Slider, numHarmonics> harmonicEndSliders;
+    juce::Label pitchLabel;
+    juce::Label startLabel;
+    juce::Label endLabel;
     juce::Slider attackSlider;
     juce::Slider decaySlider;
     juce::Slider sustainSlider;
@@ -62,6 +68,9 @@ private:
 
     // updates the GUI harmonic sliders to match the underlying levels in the backend
     void updateHarmonicSliders();
+
+    // sets component's bounds to bounds but with 10px of padding on each side
+    void layoutWithPadding(juce::Component& component, juce::Rectangle<int> bounds);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

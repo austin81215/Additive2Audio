@@ -8,15 +8,23 @@ MainComponent::MainComponent():
 {
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    auto height = 250 + 30 * (4 + numHarmonics);
-    setSize (600, height);
+    auto height = 4 * defaultThickHeight + 7 * defaultThinHeight;
+    setSize (700, height);
     startTimer (400);
+
+    addAndMakeVisible(pitchLabel);
+    pitchLabel.setText("Pitch", juce::dontSendNotification);
+    addAndMakeVisible(startLabel);
+    startLabel.setText("Start", juce::dontSendNotification);
+    addAndMakeVisible(endLabel);
+    endLabel.setText("End", juce::dontSendNotification);
 
     for(auto& slider: harmonicPitchSliders)
     {
         addAndMakeVisible(slider);
         slider.setRange(0., 10.);
         slider.setNumDecimalPlacesToDisplay(2);
+        slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         slider.addListener(this);
     }
 
@@ -25,6 +33,7 @@ MainComponent::MainComponent():
         addAndMakeVisible(slider);
         slider.setRange(0., 1.);
         slider.setNumDecimalPlacesToDisplay(2);
+        slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         slider.addListener(this);
     }
 
@@ -33,6 +42,7 @@ MainComponent::MainComponent():
         addAndMakeVisible(slider);
         slider.setRange(0., 1.);
         slider.setNumDecimalPlacesToDisplay(2);
+        slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         slider.addListener(this);
     }
 
@@ -59,19 +69,15 @@ MainComponent::MainComponent():
 
     addAndMakeVisible(attackLabel);
     attackLabel.setText("A", juce::dontSendNotification);
-    attackLabel.attachToComponent(&attackSlider, true);
     
     addAndMakeVisible(decayLabel);
     decayLabel.setText("D", juce::dontSendNotification);
-    decayLabel.attachToComponent(&decaySlider, true);
 
     addAndMakeVisible(sustainLabel);
     sustainLabel.setText("S", juce::dontSendNotification);
-    sustainLabel.attachToComponent(&sustainSlider, true);
 
     addAndMakeVisible(releaseLabel);
     releaseLabel.setText("R", juce::dontSendNotification);
-    releaseLabel.attachToComponent(&releaseSlider, true);
 
     addAndMakeVisible(presetBox);
     presetBox.addItem("Sine", static_cast<int>(Preset::Sine));
@@ -169,21 +175,48 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    midiInputList.setBounds (10, 10, getWidth() - 20, 20);
-    keyboardComponent.setBounds (10, 40, getWidth() - 20, 100);
+    auto area = getLocalBounds();
+    auto thinHeight = area.getHeight() / 15;
+    auto thickHeight = 2 * thinHeight;
+    auto labelWidth = 50;
+
+    layoutWithPadding(midiInputList, area.removeFromTop(thinHeight));
+    layoutWithPadding(keyboardComponent, area.removeFromTop(thickHeight));
+
+    auto sliderWidth = (getWidth() - labelWidth) / numHarmonics;
+    auto pitchSliderRow = area.removeFromTop(thickHeight);
+    auto startSliderRow = area.removeFromTop(thickHeight);
+    auto endSliderRow = area.removeFromTop(thickHeight);
+
+    layoutWithPadding(pitchLabel, pitchSliderRow.removeFromLeft(labelWidth));
+    layoutWithPadding(startLabel, startSliderRow.removeFromLeft(labelWidth));
+    layoutWithPadding(endLabel, endSliderRow.removeFromLeft(labelWidth));
+
     for(auto i = 0; i < numHarmonics; i++)
     {
-        auto sliderLength = (getWidth() - 40) / 3;
-        harmonicPitchSliders[i].setBounds(10, i * 30 + 150, sliderLength, 20);
-        harmonicStartSliders[i].setBounds(sliderLength + 20, i * 30 + 150, sliderLength, 20);
-        harmonicEndSliders[i].setBounds(2 * sliderLength + 30, i * 30 + 150, sliderLength, 20);
+        layoutWithPadding(harmonicPitchSliders[i], pitchSliderRow.removeFromLeft(sliderWidth));
+        layoutWithPadding(harmonicStartSliders[i], startSliderRow.removeFromLeft(sliderWidth));
+        layoutWithPadding(harmonicEndSliders[i], endSliderRow.removeFromLeft(sliderWidth));
     }
-    attackSlider.setBounds(20, 400, getWidth() - 30, 20);
-    decaySlider.setBounds(20, 430, getWidth() - 30, 20);
-    sustainSlider.setBounds(20, 460, getWidth() - 30, 20);
-    releaseSlider.setBounds(20, 490, getWidth() - 30, 20);
-    presetBox.setBounds (10, 640, getWidth() - 20, 20);
-    noteChangeTimeSlider.setBounds (10, 700, getWidth() - 20, 20);
+
+    auto row = area.removeFromTop(thinHeight);
+    layoutWithPadding(attackLabel, row.removeFromLeft(labelWidth));
+    layoutWithPadding(attackSlider, row);
+
+    row = area.removeFromTop(thinHeight);
+    layoutWithPadding(decayLabel, row.removeFromLeft(labelWidth));
+    layoutWithPadding(decaySlider, row);
+
+    row = area.removeFromTop(thinHeight);
+    layoutWithPadding(sustainLabel, row.removeFromLeft(labelWidth));
+    layoutWithPadding(sustainSlider, row);
+
+    row = area.removeFromTop(thinHeight);
+    layoutWithPadding(releaseLabel, row.removeFromLeft(labelWidth));
+    layoutWithPadding(releaseSlider, row);
+
+    layoutWithPadding(presetBox, area.removeFromTop(thinHeight));
+    layoutWithPadding(noteChangeTimeSlider, area.removeFromTop(thinHeight));
 }
 
 void MainComponent::timerCallback() 
@@ -256,4 +289,13 @@ void MainComponent::updateHarmonicSliders()
         harmonicStartSliders[i].setValue(synthAudioSource.getHarmonicStartLevel(i), juce::dontSendNotification);
         harmonicEndSliders[i].setValue(synthAudioSource.getHarmonicEndLevel(i), juce::dontSendNotification);
     }
+}
+
+void MainComponent::layoutWithPadding(juce::Component& component, juce::Rectangle<int> bounds)
+{
+    bounds.removeFromTop(5);
+    bounds.removeFromBottom(5);
+    bounds.removeFromLeft(5);
+    bounds.removeFromRight(5);
+    component.setBounds(bounds);
 }
