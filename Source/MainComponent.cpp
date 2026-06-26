@@ -6,6 +6,30 @@ MainComponent::MainComponent():
     synthAudioSource(keyboardState),
     keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard)
 {
+    // setup styling
+    
+    auto background = juce::Colours::dimgrey.darker();
+    auto componentForeground = juce::Colours::silver.darker();
+    auto componentBackground = componentForeground.darker();
+    auto accent = juce::Colours::slateblue;
+    auto text = juce::Colours::lavender;
+
+    getLookAndFeel().setColour(juce::ResizableWindow::backgroundColourId, background);
+
+    getLookAndFeel().setColour(juce::Slider::thumbColourId, accent);
+    getLookAndFeel().setColour(juce::Slider::trackColourId, componentForeground);
+    getLookAndFeel().setColour(juce::Slider::backgroundColourId, componentBackground);
+    getLookAndFeel().setColour(juce::Slider::textBoxOutlineColourId, background);
+    getLookAndFeel().setColour(juce::Slider::textBoxTextColourId, text);
+ 
+    getLookAndFeel().setColour(juce::ComboBox::backgroundColourId, componentBackground);
+    getLookAndFeel().setColour(juce::ComboBox::outlineColourId, background);
+    getLookAndFeel().setColour(juce::ComboBox::textColourId, text);
+
+    getLookAndFeel().setColour(juce::Label::textColourId, text);
+
+    // setup GUI components
+
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
     auto height = 4 * defaultThickHeight + 7 * defaultThinHeight;
@@ -54,12 +78,14 @@ MainComponent::MainComponent():
         slider->setRange(0.01, 5);
         slider->setNumDecimalPlacesToDisplay(2);
         slider->setSkewFactorFromMidPoint(1);
+        slider->setColour(juce::Slider::textBoxOutlineColourId, background); // idk why this doesn't work in the global styling but i'm busy
         slider->addListener(this);
     }
 
     addAndMakeVisible(sustainSlider);
     sustainSlider.setRange(0., 1);
     sustainSlider.setNumDecimalPlacesToDisplay(2);
+    sustainSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
     sustainSlider.addListener(this);
 
     attackSlider.setValue(synthAudioSource.getAttack(), juce::dontSendNotification);
@@ -93,6 +119,7 @@ MainComponent::MainComponent():
     noteChangeTimeSlider.setRange(0.01, 5);
     noteChangeTimeSlider.setNumDecimalPlacesToDisplay(2);
     noteChangeTimeSlider.setSkewFactorFromMidPoint(1);
+    noteChangeTimeSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
     noteChangeTimeSlider.addListener(this);
 
     addAndMakeVisible (midiInputListLabel);
