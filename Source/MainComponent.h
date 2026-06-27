@@ -11,8 +11,7 @@
 */
 class MainComponent  : 
     public juce::AudioAppComponent, 
-    private juce::Timer, 
-    private juce::Slider::Listener
+    private juce::Timer 
 {
 public:
     //==============================================================================
@@ -58,7 +57,6 @@ private:
     juce::Slider noteChangeTimeSlider;
 
     void timerCallback() override;
-    void sliderValueChanged(juce::Slider* slider) override;
 
     // from tutorial, sets MIDI input to the given index
     void setMidiInput(int index);

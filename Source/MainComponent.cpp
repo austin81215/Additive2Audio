@@ -43,31 +43,35 @@ MainComponent::MainComponent():
     addAndMakeVisible(endLabel);
     endLabel.setText("End", juce::dontSendNotification);
 
-    for(auto& slider: harmonicPitchSliders)
+    for(auto i = 0; i < numHarmonics; i++)
     {
+        auto& slider = harmonicPitchSliders[i];
         addAndMakeVisible(slider);
         slider.setRange(0., 10.);
         slider.setNumDecimalPlacesToDisplay(2);
         slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-        slider.addListener(this);
+        slider.setSkewFactorFromMidPoint(1);
+        slider.onValueChange = [this, i, &slider]{ synthAudioSource.setHarmonicPitch(i, slider.getValue()); };
     }
 
-    for(auto& slider: harmonicStartSliders)
+    for(auto i = 0; i < numHarmonics; i++)
     {
+        auto& slider = harmonicStartSliders[i];
         addAndMakeVisible(slider);
         slider.setRange(0., 1.);
         slider.setNumDecimalPlacesToDisplay(2);
         slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-        slider.addListener(this);
+        slider.onValueChange = [this, i, &slider]{ synthAudioSource.setHarmonicStartLevel(i, slider.getValue()); };
     }
 
-    for(auto& slider: harmonicEndSliders)
+    for(auto i = 0; i < numHarmonics; i++)
     {
+        auto& slider = harmonicEndSliders[i];
         addAndMakeVisible(slider);
         slider.setRange(0., 1.);
         slider.setNumDecimalPlacesToDisplay(2);
         slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-        slider.addListener(this);
+        slider.onValueChange = [this, i, &slider]{ synthAudioSource.setHarmonicEndLevel(i, slider.getValue()); };
     }
 
     updateHarmonicSliders();
@@ -79,19 +83,24 @@ MainComponent::MainComponent():
         slider->setNumDecimalPlacesToDisplay(2);
         slider->setSkewFactorFromMidPoint(1);
         slider->setColour(juce::Slider::textBoxOutlineColourId, background); // idk why this doesn't work in the global styling but i'm busy
-        slider->addListener(this);
     }
 
     addAndMakeVisible(sustainSlider);
     sustainSlider.setRange(0., 1);
     sustainSlider.setNumDecimalPlacesToDisplay(2);
     sustainSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
-    sustainSlider.addListener(this);
 
     attackSlider.setValue(synthAudioSource.getAttack(), juce::dontSendNotification);
+    attackSlider.onValueChange = [this]{ synthAudioSource.setAttack(attackSlider.getValue()); };
+    
     decaySlider.setValue(synthAudioSource.getDecay(), juce::dontSendNotification);
+    decaySlider.onValueChange = [this]{ synthAudioSource.setDecay(decaySlider.getValue()); };
+
     sustainSlider.setValue(synthAudioSource.getSustain(), juce::dontSendNotification);
+    sustainSlider.onValueChange = [this]{ synthAudioSource.setSustain(sustainSlider.getValue()); };
+
     releaseSlider.setValue(synthAudioSource.getRelease(), juce::dontSendNotification);
+    releaseSlider.onValueChange = [this]{ synthAudioSource.setRelease(releaseSlider.getValue()); };
 
     addAndMakeVisible(attackLabel);
     attackLabel.setText("A", juce::dontSendNotification);
@@ -120,7 +129,7 @@ MainComponent::MainComponent():
     noteChangeTimeSlider.setNumDecimalPlacesToDisplay(2);
     noteChangeTimeSlider.setSkewFactorFromMidPoint(1);
     noteChangeTimeSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
-    noteChangeTimeSlider.addListener(this);
+    noteChangeTimeSlider.onValueChange = [this]{ synthAudioSource.setHarmonicChangeTime(noteChangeTimeSlider.getValue()); };
 
     addAndMakeVisible (midiInputListLabel);
     midiInputListLabel.setText ("MIDI Input:", juce::dontSendNotification);
@@ -263,40 +272,6 @@ void MainComponent::setMidiInput(int index)
     deviceManager.addMidiInputDeviceCallback (newInput.identifier, synthAudioSource.getMidiCollector()); 
     midiInputList.setSelectedId (index + 1, juce::dontSendNotification);
     lastInputIndex = index;
-}
-
-void MainComponent::sliderValueChanged(juce::Slider* slider)
-{
-    if(slider == &attackSlider)
-        synthAudioSource.setAttack(slider->getValue());
-    else if(slider == &decaySlider)
-        synthAudioSource.setDecay(slider->getValue());
-    else if(slider == &sustainSlider)
-        synthAudioSource.setSustain(slider->getValue());
-    else if(slider == &releaseSlider)
-        synthAudioSource.setRelease(slider->getValue());
-    else if(slider == &noteChangeTimeSlider)
-        synthAudioSource.setHarmonicChangeTime(slider->getValue());
-
-    for(auto i = 0; i < numHarmonics; i++)
-    {
-        if(&harmonicPitchSliders[i] == slider)
-        {
-            synthAudioSource.setHarmonicPitch(i, slider->getValue());
-            return;
-        }
-        else if(&harmonicStartSliders[i] == slider)
-        {
-            synthAudioSource.setHarmonicStartLevel(i, slider->getValue());
-            return;
-        }
-        else if(&harmonicEndSliders[i] == slider)
-        {
-            synthAudioSource.setHarmonicEndLevel(i, slider->getValue());
-            return;
-        }
-    }
-
 }
 
 void MainComponent::presetHandler()
