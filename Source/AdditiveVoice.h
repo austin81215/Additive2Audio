@@ -24,7 +24,7 @@ struct AdditiveVoice: public juce::SynthesiserVoice
 
     void stopNote (float /*velocity*/, bool allowTailOff) override;
 
-    void pitchWheelMoved (int) override;
+    void pitchWheelMoved (int newPitchWheelValue) override;
     void controllerMoved (int, int) override;
 
     void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
@@ -90,10 +90,15 @@ private:
     int noteSamplesElapsed = 0;
     juce::ADSR env;
     juce::dsp::Gain<float> gain;
+    float pitchBendMult = 1;
+    int midiNote = 0;
 
     const float A = 0.1;
     const float D = 0.1;
     const float S = 0.5;
     const float R = 0.5;
     const float volume = 1. / numHarmonics / numVoices;
+
+    float hz();
+    void setHarmonicFreqs();
 };

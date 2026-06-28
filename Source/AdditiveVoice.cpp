@@ -16,10 +16,8 @@ bool AdditiveVoice::canPlaySound (juce::SynthesiserSound* sound)
 
 void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound*, int /*currentPitchWheelPosition*/) 
 {
-    auto hz = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
-    for(auto& harmonic: harmonics)
-        harmonic.osc.setFrequency(hz * harmonic.pitch, true);
-
+    midiNote = midiNoteNumber;
+    setHarmonicFreqs();
     env.noteOn();
     noteSamplesElapsed = 0;
 }
@@ -29,7 +27,13 @@ void AdditiveVoice::stopNote (float /*velocity*/, bool allowTailOff)
     env.noteOff();
 }
 
-void AdditiveVoice::pitchWheelMoved (int) {}
+void AdditiveVoice::pitchWheelMoved (int newPitchWheelValue) 
+{
+    auto bendSemitones = (newPitchWheelValue - 8192) / 8192. * 2.;
+    pitchBendMult = std::pow(2., bendSemitones / 12.);
+    setHarmonicFreqs();
+}
+
 void AdditiveVoice::controllerMoved (int, int) {}
 
 void AdditiveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) 
@@ -207,12 +211,13 @@ float AdditiveVoice::getRelease()
     return env.getParameters().release;
 }
 
-//void AdditiveVoice::setHarmonicChangeTime(float seconds)
-//{
-//    harmonicChangeTime = seconds;
-//}
-//
-//std::array<float, numInharmonics> AdditiveVoice::getInharmonicLevels(NotePositions pos)
-//{
-//    return pos == NotePositions::Start ? inharmonicStartCoeffs : inharmonicEndCoeffs;
-//}
+float AdditiveVoice::hz()
+{
+    return juce::MidiMessage::getMidiNoteInHertz(midiNote) * pitchBendMult;
+}
+
+void AdditiveVoice::setHarmonicFreqs()
+{
+    for(auto& harmonic: harmonics)
+        harmonic.osc.setFrequency(hz() * harmonic.pitch, true);
+}
