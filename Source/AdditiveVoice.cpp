@@ -6,7 +6,7 @@ AdditiveVoice::AdditiveVoice()
     for(auto& harmonic: harmonics)
         harmonic.osc.initialise([](float x){return std::sin(x);});
     env.setParameters(juce::ADSR::Parameters(A, D, S, R));
-    gain.setGainLinear(volume);
+    gain.setGainLinear(maxVolume);
 }
 
 bool AdditiveVoice::canPlaySound (juce::SynthesiserSound* sound) 
@@ -14,10 +14,11 @@ bool AdditiveVoice::canPlaySound (juce::SynthesiserSound* sound)
     return dynamic_cast<SineWaveSound*> (sound) != nullptr;
 }
 
-void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound*, int /*currentPitchWheelPosition*/) 
+void AdditiveVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound*, int currentPitchWheelPosition) 
 {
     midiNote = midiNoteNumber;
-    setHarmonicFreqs();
+    gain.setGainLinear(velocity * velocity * maxVolume);
+    pitchWheelMoved(currentPitchWheelPosition);
     env.noteOn();
     noteSamplesElapsed = 0;
 }

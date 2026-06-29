@@ -97,7 +97,7 @@ private:
     const float D = 0.1;
     const float S = 0.5;
     const float R = 0.5;
-    const float volume = 1. / numHarmonics / numVoices;
+    const float maxVolume = 1. / numHarmonics / numVoices;
 
     float hz();
     void setHarmonicFreqs();
