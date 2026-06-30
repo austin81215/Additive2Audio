@@ -47,7 +47,7 @@ MainComponent::MainComponent():
     {
         auto& slider = harmonicPitchSliders[i];
         addAndMakeVisible(slider);
-        slider.setRange(0., 10.);
+        slider.setRange(0., numHarmonics);
         slider.setNumDecimalPlacesToDisplay(2);
         slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         slider.setSkewFactorFromMidPoint(1);
@@ -121,6 +121,12 @@ MainComponent::MainComponent():
     presetBox.addItem("Square", static_cast<int>(Preset::Square));
     presetBox.addItem("Classic Organ", static_cast<int>(Preset::Organ));
     presetBox.addItem("Pull Out All Stops", static_cast<int>(Preset::AllStops));
+    presetBox.addItem("Bell", static_cast<int>(Preset::Bell));
+    presetBox.addItem("Wah", static_cast<int>(Preset::Wah));
+    presetBox.addItem("haW", static_cast<int>(Preset::haW));
+    presetBox.addItem("FmPad", static_cast<int>(Preset::FmPad));
+    presetBox.addItem("Detune", static_cast<int>(Preset::Detune));
+    presetBox.addItem("Noise", static_cast<int>(Preset::Noise));
     presetBox.setSelectedId(2);
     presetBox.onChange = [this]{presetHandler();};
 

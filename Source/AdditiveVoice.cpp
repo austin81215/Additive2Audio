@@ -120,52 +120,131 @@ void AdditiveVoice::prepare(double sampleRate, int samplesPerBlock, int channels
 //    inharmonicPitches[index] = mult;
 //}
 //
+
 void AdditiveVoice::setPreset(Preset preset)
 {
-    std::array<float, numHarmonics> newStartCoeffs;
-    std::array<float, numHarmonics> newEndCoeffs;
-    std::array<float, numHarmonics> newPitches;
-
     switch(preset)
     {
         case Preset::Sine:
-            newStartCoeffs = {1, 0, 0, 0, 0, 0, 0, 0};
-            newEndCoeffs = {1, 0, 0, 0, 0, 0, 0, 0};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = i == 0 ? 1 : 0;
+                harmonics[i].endLevel = i == 0 ? 1 : 0;
+                harmonics[i].pitch = i + 1;
+            }
             break;
         case Preset::Saw:
-            newStartCoeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
-            newEndCoeffs = {1, 1/2., 1/3., 1/4., 1/5., 1/6., 1/7., 1/8.};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = 1. / (i + 1);
+                harmonics[i].endLevel = 1. / (i + 1);
+                harmonics[i].pitch = i + 1;
+            }
             break;
         case Preset::FilteredSaw:
-            newStartCoeffs = {1, 1/2., 1/3., 1/4., 0, 0, 0, 0};
-            newEndCoeffs = {1, 1/2., 1/3., 1/4., 0, 0, 0, 0};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = i < 4 ? 1. / (i + 1) : 0;
+                harmonics[i].endLevel = i < 4 ? 1. / (i + 1) : 0;
+                harmonics[i].pitch = i + 1;
+            }
             break;
         case Preset::Square:
-            newStartCoeffs = {1, 0, 1/3., 0, 1/5., 0, 1/7., 0};
-            newEndCoeffs = {1, 0, 1/3., 0, 1/5., 0, 1/7., 0};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = i % 2 == 0 ? 1. / (i + 1) : 0;
+                harmonics[i].endLevel = i % 2 == 0 ? 1. / (i + 1) : 0;
+                harmonics[i].pitch = i + 1;
+            }
             break;
         case Preset::Organ:
-            newStartCoeffs = {1, 1, 1, 0, 0, 0, 0, 1};
-            newEndCoeffs = {1, 1, 1, 0, 0, 0, 0, 1};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = i < 3 || i == 7 ? 1 : 0;
+                harmonics[i].endLevel = i < 3 || i == 7 ? 1 : 0;
+                harmonics[i].pitch = i + 1;
+            }
             break;
         case Preset::AllStops:
-            newStartCoeffs = {1, 1, 1, 1, 1, 1, 1, 1};
-            newEndCoeffs = {1, 1, 1, 1, 1, 1, 1, 1};
-            newPitches = {1, 2, 3, 4, 5, 6, 7, 8};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = 1;
+                harmonics[i].endLevel = 1;
+                harmonics[i].pitch = i + 1;
+            }
+            break;
+        case Preset::Bell:
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                if(i % 2 == 0)
+                {
+                    harmonics[i].startLevel = 1. / (i + 1);
+                    harmonics[i].endLevel = 1. / (i + 1);
+                    harmonics[i].pitch = i + 1;
+                }
+                else
+                {
+                    harmonics[i].startLevel = 1. / ((i / 2 + 1) * 1.2);
+                    harmonics[i].endLevel = 1. / ((i / 2 + 1) * 1.2);
+                    harmonics[i].pitch = (i / 2 + 1) * 1.2;
+                }
+            }
+            break;
+        case Preset::Wah:
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = i < 4 ? 1. / (i + 1) : 0;
+                harmonics[i].endLevel = 1. / (i + 1);
+                harmonics[i].pitch = i + 1;
+                harmonicChangeTime = .2;
+            }
+            break;
+        case Preset::haW:
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = 1. / (i + 1);
+                harmonics[i].endLevel = i < 4 ? 1. / (i + 1) : 0;
+                harmonics[i].pitch = i + 1;
+                harmonicChangeTime = .2;
+            }
+            break;
+        case Preset::FmPad:
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                if(i % 2 == 0)
+                {
+                    harmonics[i].startLevel = 1. / (i + 1);
+                    harmonics[i].endLevel = 1. / (i + 1);
+                    harmonics[i].pitch = i + 1;
+                }
+                else
+                {
+                    harmonics[i].startLevel = 0;
+                    harmonics[i].endLevel = 1. / ((i / 2 + 1) * 1.2);
+                    harmonics[i].pitch = (i / 2 + 1) * 1.2;
+                }
+            }
+            harmonicChangeTime = .2;
+            break;
+        case Preset::Detune:
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = 1. / (i / 4 + 1) + (i % 4 * .01 - .02);
+                harmonics[i].endLevel = 1. / (i / 4 + 1) + (i % 4 * .01 - .02);
+                harmonics[i].pitch = (i / 4) + 1;
+            }
+            break;
+        case Preset::Noise:
+            std::array<float, 16> noise = {9.707513, 5.9621167, 6.005609, 5.940589, 2.8377259, 0.09566903, 8.4352255, 2.2492898, 8.31471, 2.795267, 5.844146, 7.568612, 9.189848, 0.07325292, 3.1148136, 5.9585714};
+            for(auto i = 0; i < numHarmonics; i++)
+            {
+                harmonics[i].startLevel = 1;
+                harmonics[i].endLevel = 1;
+                harmonics[i].pitch = noise[i];
+            }
             break;
     }
 
-    for(auto i = 0; i < numHarmonics; i++)
-    {
-        harmonics[i].startLevel = newStartCoeffs[i];
-        harmonics[i].endLevel = newEndCoeffs[i];
-        harmonics[i].pitch = newPitches[i];
-    }
 }
 
 void AdditiveVoice::setAttack(float level)

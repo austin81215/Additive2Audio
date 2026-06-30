@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int numHarmonics = 8;
+constexpr int numHarmonics = 16;
 constexpr int numVoices = 8;
 
 enum class Preset 
@@ -10,5 +10,11 @@ enum class Preset
     FilteredSaw,
     Square,
     Organ,
-    AllStops
+    AllStops,
+    Bell,
+    Wah,
+    haW,
+    FmPad,
+    Detune,
+    Noise,
 };
