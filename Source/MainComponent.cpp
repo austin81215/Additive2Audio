@@ -32,7 +32,7 @@ MainComponent::MainComponent():
 
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
-    auto height = 4 * defaultThickHeight + 7 * defaultThinHeight;
+    auto height = 4 * defaultThickHeight + 8 * defaultThinHeight;
     setSize (1300, height);
     startTimer (400);
 
@@ -124,8 +124,7 @@ MainComponent::MainComponent():
     presetBox.addItem("Bell", static_cast<int>(Preset::Bell));
     presetBox.addItem("Wah", static_cast<int>(Preset::Wah));
     presetBox.addItem("haW", static_cast<int>(Preset::haW));
-    presetBox.addItem("FmPad", static_cast<int>(Preset::FmPad));
-    presetBox.addItem("Detune", static_cast<int>(Preset::Detune));
+    presetBox.addItem("Detune Tremolo", static_cast<int>(Preset::Detune));
     presetBox.addItem("Noise", static_cast<int>(Preset::Noise));
     presetBox.setSelectedId(2);
     presetBox.onChange = [this]{presetHandler();};
@@ -139,6 +138,17 @@ MainComponent::MainComponent():
     noteChangeTimeSlider.setSkewFactorFromMidPoint(1);
     noteChangeTimeSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
     noteChangeTimeSlider.onValueChange = [this]{ synthAudioSource.setHarmonicChangeTime(noteChangeTimeSlider.getValue()); };
+
+    addAndMakeVisible(gainLabel);
+    gainLabel.setText("Volume", juce::dontSendNotification);
+
+    addAndMakeVisible(gainSlider);
+    gainSlider.setRange(0, 32);
+    gainSlider.setValue(1);
+    gainSlider.setNumDecimalPlacesToDisplay(2);
+    gainSlider.setSkewFactorFromMidPoint(1);
+    gainSlider.setColour(juce::Slider::textBoxOutlineColourId, background); // ^^^
+    gainSlider.onValueChange = [this]{ synthAudioSource.setGainMult(gainSlider.getValue()); };
 
     addAndMakeVisible (midiInputListLabel);
     midiInputListLabel.setText ("MIDI Input:", juce::dontSendNotification);
@@ -221,7 +231,7 @@ void MainComponent::resized()
     // update their positions.
 
     auto area = getLocalBounds();
-    auto thinHeight = area.getHeight() / 15;
+    auto thinHeight = area.getHeight() / 16;
     auto thickHeight = 2 * thinHeight;
     auto labelWidth = 50;
 
@@ -265,6 +275,10 @@ void MainComponent::resized()
     row = area.removeFromTop(thinHeight);
     layoutWithPadding(automationLabel, row.removeFromLeft(2 * labelWidth));
     layoutWithPadding(noteChangeTimeSlider, row);
+
+    row = area.removeFromTop(thinHeight);
+    layoutWithPadding(gainLabel, row.removeFromLeft(2 * labelWidth));
+    layoutWithPadding(gainSlider, row);
 }
 
 void MainComponent::timerCallback() 

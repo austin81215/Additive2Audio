@@ -14,7 +14,6 @@ enum class Preset
     Bell,
     Wah,
     haW,
-    FmPad,
     Detune,
     Noise,
 };

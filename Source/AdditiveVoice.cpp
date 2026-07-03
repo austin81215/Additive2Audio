@@ -53,7 +53,7 @@ void AdditiveVoice::renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int 
             currentSample += harmonic.osc.processSample(0.0f) * coeff;
         }
 
-        currentSample = gain.processSample(currentSample * env.getNextSample());
+        currentSample = gain.processSample(currentSample * env.getNextSample()) * gainMult;
 
         for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
             outputBuffer.addSample (i, startSample, currentSample);
@@ -174,21 +174,26 @@ void AdditiveVoice::setPreset(Preset preset)
             }
             break;
         case Preset::Bell:
-            for(auto i = 0; i < numHarmonics; i++)
+            for(auto i = 0; i < numHarmonics - 2; i++)
             {
+                harmonics[i].pitch = i + 1;
                 if(i % 2 == 0)
                 {
                     harmonics[i].startLevel = 1. / (i + 1);
                     harmonics[i].endLevel = 1. / (i + 1);
-                    harmonics[i].pitch = i + 1;
                 }
                 else
                 {
-                    harmonics[i].startLevel = 1. / ((i / 2 + 1) * 1.2);
-                    harmonics[i].endLevel = 1. / ((i / 2 + 1) * 1.2);
-                    harmonics[i].pitch = (i / 2 + 1) * 1.2;
+                    harmonics[i].startLevel = 0;
+                    harmonics[i].endLevel = 0;
                 }
             }
+            harmonics[numHarmonics - 2].startLevel = .75;
+            harmonics[numHarmonics - 2].endLevel = .75;
+            harmonics[numHarmonics - 2].pitch = 1.2;
+            harmonics[numHarmonics - 1].startLevel = .75;
+            harmonics[numHarmonics - 1].endLevel = .75;
+            harmonics[numHarmonics - 1].pitch = 2.4;
             break;
         case Preset::Wah:
             for(auto i = 0; i < numHarmonics; i++)
@@ -208,30 +213,13 @@ void AdditiveVoice::setPreset(Preset preset)
                 harmonicChangeTime = .2;
             }
             break;
-        case Preset::FmPad:
-            for(auto i = 0; i < numHarmonics; i++)
-            {
-                if(i % 2 == 0)
-                {
-                    harmonics[i].startLevel = 1. / (i + 1);
-                    harmonics[i].endLevel = 1. / (i + 1);
-                    harmonics[i].pitch = i + 1;
-                }
-                else
-                {
-                    harmonics[i].startLevel = 0;
-                    harmonics[i].endLevel = 1. / ((i / 2 + 1) * 1.2);
-                    harmonics[i].pitch = (i / 2 + 1) * 1.2;
-                }
-            }
-            harmonicChangeTime = .2;
-            break;
         case Preset::Detune:
             for(auto i = 0; i < numHarmonics; i++)
             {
-                harmonics[i].startLevel = 1. / (i / 4 + 1) + (i % 4 * .01 - .02);
-                harmonics[i].endLevel = 1. / (i / 4 + 1) + (i % 4 * .01 - .02);
-                harmonics[i].pitch = (i / 4) + 1;
+                const auto detuneAmount = .02;
+                harmonics[i].startLevel = 1. / (i / 4 + 1);
+                harmonics[i].endLevel = 1. / (i / 4 + 1);
+                harmonics[i].pitch = (i / 4) + 1 + (i % 4 * detuneAmount - 2 * detuneAmount);
             }
             break;
         case Preset::Noise:

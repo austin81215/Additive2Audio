@@ -49,7 +49,6 @@ class SynthAudioSource: public juce::AudioSource
         // sets the release time in seconds
         void setRelease(float level);
 
-
         // gets the attack time in seconds
         float getAttack();
 
@@ -64,6 +63,9 @@ class SynthAudioSource: public juce::AudioSource
 
         // sets the time that it takes to go from the start sound to the end sound
         void setHarmonicChangeTime(float seconds);
+
+        // sets the gain multiplier so synth doesn't have to be super quiet. use big numbers with caution.
+        void setGainMult(float mult);
 
     private:
         juce::MidiKeyboardState& keyboardState;

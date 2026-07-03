@@ -14,6 +14,7 @@ struct AdditiveVoice: public juce::SynthesiserVoice
 
     std::array<Harmonic, numHarmonics> harmonics;
     float harmonicChangeTime = 1;
+    float gainMult = 1;
 
     AdditiveVoice();
 

@@ -133,3 +133,9 @@ void SynthAudioSource::setHarmonicChangeTime(float seconds)
     for(auto i = 0; i < synth.getNumVoices(); i++)
         static_cast<AdditiveVoice*>(synth.getVoice(i))->harmonicChangeTime = seconds;
 }
+
+void SynthAudioSource::setGainMult(float mult)
+{
+    for(auto i = 0; i < synth.getNumVoices(); i++)
+        static_cast<AdditiveVoice*>(synth.getVoice(i))->gainMult = mult;
+}
