@@ -33,7 +33,7 @@ MainComponent::MainComponent():
     addAndMakeVisible (keyboardComponent);
     setAudioChannels (0, 2);
     auto height = 4 * defaultThickHeight + 7 * defaultThinHeight;
-    setSize (700, height);
+    setSize (1300, height);
     startTimer (400);
 
     addAndMakeVisible(pitchLabel);
@@ -129,6 +129,9 @@ MainComponent::MainComponent():
     presetBox.addItem("Noise", static_cast<int>(Preset::Noise));
     presetBox.setSelectedId(2);
     presetBox.onChange = [this]{presetHandler();};
+
+    addAndMakeVisible(automationLabel);
+    automationLabel.setText("Automation Time", juce::dontSendNotification);
 
     addAndMakeVisible(noteChangeTimeSlider);
     noteChangeTimeSlider.setRange(0.01, 5);
@@ -258,7 +261,10 @@ void MainComponent::resized()
     layoutWithPadding(releaseSlider, row);
 
     layoutWithPadding(presetBox, area.removeFromTop(thinHeight));
-    layoutWithPadding(noteChangeTimeSlider, area.removeFromTop(thinHeight));
+
+    row = area.removeFromTop(thinHeight);
+    layoutWithPadding(automationLabel, row.removeFromLeft(2 * labelWidth));
+    layoutWithPadding(noteChangeTimeSlider, row);
 }
 
 void MainComponent::timerCallback() 

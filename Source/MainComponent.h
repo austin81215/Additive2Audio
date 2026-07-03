@@ -55,6 +55,7 @@ private:
     juce::Label releaseLabel;
     juce::ComboBox presetBox;
     juce::Slider noteChangeTimeSlider;
+    juce::Label automationLabel;
 
     void timerCallback() override;
 
