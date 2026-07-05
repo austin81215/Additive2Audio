@@ -1,33 +1,31 @@
 #pragma once
 
-#include <JuceHeader.h>
-#include "SynthAudioSource.h"
 #include "Constants.h"
+#include "SynthAudioSource.h"
+#include <JuceHeader.h>
 
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : 
-    public juce::AudioAppComponent, 
-    private juce::Timer 
-{
-public:
+class MainComponent : public juce::AudioAppComponent, private juce::Timer {
+  public:
     //==============================================================================
     MainComponent();
     ~MainComponent() override;
 
     //==============================================================================
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
-    void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override;
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+    void getNextAudioBlock(
+        const juce::AudioSourceChannelInfo &bufferToFill) override;
     void releaseResources() override;
 
     //==============================================================================
-    void paint (juce::Graphics& g) override;
+    void paint(juce::Graphics &g) override;
     void resized() override;
 
-private:
+  private:
     //==============================================================================
     // Your private member variables go here...
     const int defaultThinHeight = 50;
@@ -67,11 +65,13 @@ private:
     // handler for when a preset is selected
     void presetHandler();
 
-    // updates the GUI harmonic sliders to match the underlying levels in the backend
+    // updates the GUI harmonic sliders to match the underlying levels in the
+    // backend
     void updateHarmonicSliders();
 
     // sets component's bounds to bounds but with 10px of padding on each side
-    void layoutWithPadding(juce::Component& component, juce::Rectangle<int> bounds);
+    void layoutWithPadding(juce::Component &component,
+                           juce::Rectangle<int> bounds);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

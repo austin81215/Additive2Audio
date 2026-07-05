@@ -3,8 +3,7 @@
 constexpr int numHarmonics = 16;
 constexpr int numVoices = 8;
 
-enum class Preset 
-{
+enum class Preset {
     Sine = 1,
     Saw,
     FilteredSaw,
